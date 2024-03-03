@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('apellidoPaterno', 50);
             $table->string('apellidoMaterno', 50);
             $table->String('rfc', 13);
-            $table->String('telefono', 15);
+            $table->String('telefono', 20);
             $table->String('correo')->array_unique();
             $table->String('direccion');
             $table->integer('idProducto')->unsigned();
