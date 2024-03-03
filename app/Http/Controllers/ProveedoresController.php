@@ -2,32 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProveedoresModel;
 use Illuminate\Http\Request;
 
 class ProveedoresController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * !Muestra el módulo provedores, una tabla con los proveddores
      */
     public function index()
     {
-        //
+        //obtenemos la lista de los proveedores ordenados por id y con paginacion de 15 en 15
+        $proveedores = ProveedoresModel::orderBy("idProveedor", "asc")->paginate(15);
+
+        //mostramos la vista y le enviamos los registros de proveedores
+        return view("proveedores/index", compact("proveedores"));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * !Muestra la vista con el formulario para agregar un proveedor
      */
     public function create()
     {
-        //
+        return view("proveedores/agregar/agregar");
     }
 
     /**
-     * Store a newly created resource in storage.
+     * !Inserta un registro en la base de datos
      */
-    public function store(Request $request)
+    public function insert(Request $request)
     {
-        //
+        //recepción de datos del formulario
+        $data = [
+            'razonSocial' => $request->input("razon_social"),
+            'nombreCompleto' => $request->input("nombre"),
+            'direccion' => $request->input("direccion"),
+            'telefono' => $request->input("telefono"),
+            'correo' => $request->input("correo"),
+            'rfc' => $request->input("rfc")
+        ];
+
+        // Insersión del nuevo regristro en la base de datos
+        ProveedoresModel::create($data);
+
+        //redirecciona a la pagina proveedores
+        return redirect()->route('proveedores');
     }
 
     /**
@@ -39,26 +58,51 @@ class ProveedoresController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * !Edita un proveedor, este es el previo antes de actualizar definitivamente
      */
     public function edit(string $id)
     {
-        //
+        //busca el proveedor
+        $proveedor = ProveedoresModel::find($id);
+
+        //retorna la vista para actualizar y envia resultado de la busqueda
+        return view('proveedores/editar/editar', compact('proveedor'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * !Actualiza un proveedor en específico
      */
     public function update(Request $request, string $id)
     {
-        //
+        //recepción de datos del formulario
+        $data = [
+            'razonSocial' => $request->input("razon_social"),
+            'nombreCompleto' => $request->input("nombre"),
+            'direccion' => $request->input("direccion"),
+            'telefono' => $request->input("telefono"),
+            'correo' => $request->input("correo"),
+            'rfc' => $request->input("rfc")
+        ];
+
+        //buscamos el proveedor para verificar que exista
+        $proveedor = ProveedoresModel::find($id);
+
+        //actualizamos ese proveedor con los datos recibidos
+        $proveedor->update($data);
+
+        //redirigimos a la vista proveedores, en teoría con un mensaje
+        return redirect()->route('proveedores')->with('success', 'Proveedor eliminado exitosamente!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * !Elimina un proveedor mediante su id
      */
     public function destroy(string $id)
     {
-        //
+        //eliminamos el proveedor de la base de datos, usando su id
+        ProveedoresModel::destroy($id);
+
+        //redirigimos a la vista proveedores, en teoría con un mensaje
+        return redirect()->route('proveedores')->with('success', 'Proveedor eliminado exitosamente!');
     }
 }
