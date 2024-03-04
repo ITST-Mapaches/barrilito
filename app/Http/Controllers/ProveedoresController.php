@@ -10,13 +10,30 @@ class ProveedoresController extends Controller
     /**
      * !Muestra el módulo provedores, una tabla con los proveddores
      */
-    public function index()
+    public function index(Request $request)
     {
-        //obtenemos la lista de los proveedores ordenados por id y con paginacion de 15 en 15
-        $proveedores = ProveedoresModel::orderBy("idProveedor", "asc")->paginate(15);
+        //guardamos el valor de la petición search en $search
+        $search = $request->search;
+
+        //buscamos los registros cuyo nombre o razon social que contenga el valor de la busqueda al inicio / medio o final
+        // ademas los ordena de manera ascendente por su id y los pagina de 15 en 15
+        $proveedores = ProveedoresModel::where("nombreCompleto", "LIKE", "%" . $search . "%")
+            ->orWhere("razonSocial", "LIKE", "%" . $search . "%")
+            ->orderBy("idProveedor", "asc")
+            ->paginate(15);
+
+        // evalua si se debe reestablecer la busqueda, si $search es vacio significa que no se ha hecho ninguna búsqueda
+        $reestablecerBusqueda = ($search == "") ? false : true;
+
+        //en el arreglo agregamos pares: clave - valor
+        $data = [
+            'search' => $search,
+            'proveedores' => $proveedores,
+            'reestablecerBusqueda' => $reestablecerBusqueda
+        ];
 
         //mostramos la vista y le enviamos los registros de proveedores
-        return view("proveedores/index", compact("proveedores"));
+        return view("proveedores/index", $data);
     }
 
     /**

@@ -1,9 +1,50 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{-- !titulo de la sección --}}
-            {{ __('Proveedores') }}
-        </h2>
+
+        <div class="w-full flex justify-between flex-wrap gap-2">
+
+            <h2 class=" inline font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{-- !titulo de la sección --}}
+                {{ __('Proveedores') }}
+            </h2>
+
+            <form class="flex items-center min-w-96" action="{{ route('proveedores') }}" method="GET">
+                <label for="search" class="sr-only">Search</label>
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="whitesmoke" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="search" name="search"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:bg-gray-600"
+                        placeholder="Busca un proveedor..." required />
+                </div>
+                <button type="submit" title="Buscar"
+                    class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 active:scale-90 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                    <span class="sr-only">Search</span>
+                </button>
+                {{-- * evalua si aparece un boton para redirigirnos a la vista proveedores dependiendo del valor actual de la variable --}}
+                @if ($reestablecerBusqueda)
+                    <a href="{{ route('proveedores') }}" title="Reestablecer búsqueda"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-red-700 rounded-lg border border-red-700 hover:bg-red-800 active:scale-90 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                @endif
+            </form>
+
+        </div>
+
     </x-slot>
 
     <div class="py-12">
@@ -17,7 +58,7 @@
             <br>
 
             {{-- * agrega la paginación --}}
-            {{ $proveedores->links() }}
+            {{ $proveedores->appends(['search' => $search]) }}
             <br>
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -100,7 +141,7 @@
 
             <br>
             {{-- *agrega la paginación --}}
-            {{ $proveedores->links() }}
+            {{ $proveedores->appends(['search' => $search]) }}
 
             {{-- !fin contenido de la sección --}}
 
