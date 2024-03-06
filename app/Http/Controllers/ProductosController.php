@@ -145,10 +145,15 @@ class ProductosController extends Controller
     public function destroy(string $id)
     {
 
+        try {
             //eliminamos el producto de la base de datos, usando su id
             ProductosModel::destroy($id);
 
-        //redirecciona a la pagina productos, en teoria con un mensaje
-        return redirect()->route('productos')->with('success', 'Producto eliminado exitosamente');
+            //redirecciona a la pagina productos, en teoria con un mensaje
+            return redirect()->route('productos')->with('success', 'Producto eliminado exitosamente');
+        } catch (\Exception $e) {
+            //redirecciona a la pagina productos
+            return redirect()->route('productos');
+        }
     }
 }
