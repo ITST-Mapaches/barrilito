@@ -20,9 +20,11 @@ class ProductosController extends Controller
 
         //buscamos los registros cuyo nombre o descripción que contenga el valor de la busqueda al inicio / medio o final
         // ademas los ordena de manera ascendente por su id y los pagina de 15 en 15
-        $productos = ProductosModel::where("nombre", "LIKE", "%" . $search . "%")
-            ->orWhere("descripcion", "LIKE", "%" . $search . "%")
-            ->orderBy("idProducto", "asc")
+        $productos = ProductosModel::select('productos.*', 'proveedores.nombreCompleto as nombre_proveedor')
+            ->leftJoin('proveedores', 'productos.idProveedor', '=', 'proveedores.idProveedor')
+            ->where("productos.nombre", "LIKE", "%" . $search . "%")
+            ->orWhere("productos.descripcion", "LIKE", "%" . $search . "%")
+            ->orderBy("productos.idProducto", "asc")
             ->paginate(15);
 
         // evalua si se debe reestablecer la busqueda, si $search es vacio significa que no se ha hecho ninguna búsqueda
@@ -142,8 +144,9 @@ class ProductosController extends Controller
      */
     public function destroy(string $id)
     {
-        //eliminamos el proveedor de la base de datos, usando su id
-        ProductosModel::destroy($id);
+
+            //eliminamos el producto de la base de datos, usando su id
+            ProductosModel::destroy($id);
 
         //redirecciona a la pagina productos, en teoria con un mensaje
         return redirect()->route('productos')->with('success', 'Producto eliminado exitosamente');
