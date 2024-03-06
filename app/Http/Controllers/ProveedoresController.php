@@ -67,14 +67,6 @@ class ProveedoresController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * !Edita un proveedor, este es el previo antes de actualizar definitivamente
      */
     public function edit(string $id)
@@ -108,7 +100,7 @@ class ProveedoresController extends Controller
         $proveedor->update($data);
 
         //redirigimos a la vista proveedores, en teoría con un mensaje
-        return redirect()->route('proveedores')->with('success', 'Proveedor eliminado exitosamente!');
+        return redirect()->route('proveedores')->with('success', 'Proveedor actualizado exitosamente!');
     }
 
     /**
