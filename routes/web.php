@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedoresController;
@@ -62,6 +63,27 @@ Route::get('/editarproducto/{producto}', [ProductosController::class, 'edit'])->
 
 // * ruta que actualiza un producto, al pulsar el boton actualizar, entra en juego esta ruta
 Route::post('/actualizarproducto/{producto}', [ProductosController::class, 'update'])->middleware(['auth'])->name('actualizarproducto');
+
+
+//!Clientes
+// * ruta que muestra la tabla con clientes
+Route::get('/clientes', [ClientesController::class, 'index'])->middleware(['auth'])->name('clientes');
+
+// * ruta que muestra un formulario para agregar un cliente
+Route::get('/agregarcliente', [ClientesController::class, 'create'])->middleware(['auth'])->name('agregarcliente');
+
+// * ruta que inserta un cliente en la base de datos
+Route::post('/insertcliente', [ClientesController::class, 'insert'])->middleware(['auth'])->name('insertcliente');
+
+// * ruta que elimina un cliente de la base de datos
+Route::get('/eliminarcliente/{cliente}', [ClientesController::class, 'destroy'])->middleware(['auth'])->name('eliminarcliente');
+
+// * ruta que edita un cliente, obtiene la información de un cliente y la muestra en un formulario
+Route::get('/editarcliente/{cliente}', [ClientesController::class, 'edit'])->middleware(['auth'])->name('editarcliente');
+
+// * ruta que actualiza un cliente, al pulsar el boton actualizar, entra en juego esta ruta
+Route::post('/actualizarcliente/{cliente}', [ClientesController::class, 'update'])->middleware(['auth'])->name('actualizarcliente');
+
 
 
 Route::middleware('auth')->group(function () {
