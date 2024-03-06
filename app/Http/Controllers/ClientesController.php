@@ -18,10 +18,12 @@ class ClientesController extends Controller
 
         //buscamos los registros cuyo nombre o razon social que contenga el valor de la busqueda al inicio / medio o final
         // ademas los ordena de manera ascendente por su id y los pagina de 15 en 15
-        $clientes = ClientesModel::where("nombre", "LIKE", "%" . $search . "%")
-            ->orWhere("apellidoPaterno", "LIKE", "%" . $search . "%")
-            ->orWhere("apellidoMaterno", "LIKE", "%" . $search . "%")
-            ->orderBy("idCliente", "asc")
+        $clientes = ClientesModel::select('clientes.*', 'productos.nombre as nombre_producto')
+            ->leftJoin('productos', 'clientes.idProducto', '=', 'productos.idProducto')
+            ->where("clientes.nombre", "LIKE", "%" . $search . "%")
+            ->orWhere("clientes.apellidoPaterno", "LIKE", "%" . $search . "%")
+            ->orWhere("clientes.apellidoMaterno", "LIKE", "%" . $search . "%")
+            ->orderBy("clientes.idCliente", "asc")
             ->paginate(15);
 
         // evalua si se debe reestablecer la busqueda, si $search es vacio significa que no se ha hecho ninguna búsqueda
