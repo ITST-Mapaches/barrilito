@@ -82,7 +82,7 @@ class ProductosController extends Controller
 
 
     /**
-     * Show the form for editing the specified resource.
+     * !Edita un producto, este es el previo antes de actualizar definitivamente
      */
     public function edit(string $id)
     {
@@ -110,7 +110,7 @@ class ProductosController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * !Actualiza un producto en específico
      */
     public function update(Request $request, string $id)
     {
@@ -130,7 +130,7 @@ class ProductosController extends Controller
             'idProveedor' => $request->input("idProveedor"),
         ];
 
-        //buscamos el proveedor para verificar que exista
+        //buscamos el producto para verificar que exista
         $producto = ProductosModel::find($id);
 
         $producto->update($data);
@@ -140,7 +140,7 @@ class ProductosController extends Controller
     }
 
     /**
-     * !Elimina un proveedor mediante su id
+     * !Elimina un producto mediante su id
      */
     public function destroy(string $id)
     {
