@@ -2,48 +2,109 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductosModel;
+use App\Models\ProveedoresModel;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class ProductosController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * !Muestra el módulo productos, una tabla con los productos
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        //guardamos el valor de la petición search en $search
+        $search = $request->search;
+
+        //buscamos los registros cuyo nombre o descripción que contenga el valor de la busqueda al inicio / medio o final
+        // ademas los ordena de manera ascendente por su id y los pagina de 15 en 15
+        $productos = ProductosModel::where("nombre", "LIKE", "%" . $search . "%")
+            ->orWhere("descripcion", "LIKE", "%" . $search . "%")
+            ->orderBy("idProducto", "asc")
+            ->paginate(15);
+
+        // evalua si se debe reestablecer la busqueda, si $search es vacio significa que no se ha hecho ninguna búsqueda
+        $reestablecerBusqueda = ($search == "") ? false : true;
+
+        //en el arreglo agregamos pares: clave - valor
+        $data = [
+            'search' => $search,
+            'productos' => $productos,
+            'reestablecerBusqueda' => $reestablecerBusqueda
+        ];
+
+        //mostramos la vista y le enviamos los registros de productos
+        return view("productos/index", $data);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * !Muestra la vista con el formulario para agregar un producto
      */
     public function create()
     {
-        //
+        $proveedores = ProveedoresModel::get(['idProveedor', 'nombreCompleto']);
+
+        return view("productos/agregar/agregar", compact("proveedores"));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * !Inserta un registro en la base de datos
      */
-    public function store(Request $request)
+    public function insert(Request $request)
     {
-        //
+
+        // formateando la fecha
+        $fecha = $request->input("expiracion");
+
+        // invirtiendo el orden en el que llega la fecha de mes/dia/año a la sintaxis de mysql año-mes-día
+        $fechaFormateada = Carbon::createFromFormat('m/d/Y', $fecha)->format('Y-m-d');
+
+        //recepción de datos del formulario
+        $data = [
+            'nombre' => $request->input("nombre"),
+            'descripcion' => $request->input("descripcion"),
+            'precio' => $request->input("precio"),
+            'expiracion' => $fechaFormateada,
+            'stock' => $request->input("stock"),
+            'idProveedor' => $request->input("idProveedor"),
+        ];
+
+        // Insersión del nuevo regristro en la base de datos
+        ProductosModel::create($data);
+
+        //redirecciona a la pagina productos
+        return redirect()->route('productos');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        //buscamos el producto
+        $producto = ProductosModel::find($id);
+
+        // formateando la fecha
+        $fecha = $producto->expiracion;
+
+        // invirtiendo el orden en el que llega la fecha de mes/dia/año a la sintaxis de mysql año-mes-día
+        $fechaFormateada = Carbon::createFromFormat('Y-m-d', $fecha)->format('m/d/Y');
+
+        //buscamos los proveedores
+        $proveedores = ProveedoresModel::get(['idProveedor', 'nombreCompleto']);
+
+
+        $data = [
+            'producto' => $producto,
+            'proveedores' => $proveedores,
+            'expiracion' => $fechaFormateada,
+        ];
+
+        //retorna la vista para actualizar y envia resultado de la busqueda
+        return view('productos/editar/editar', $data);
     }
 
     /**
@@ -51,14 +112,40 @@ class ProductosController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // formateando la fecha
+        $fecha = $request->input("expiracion");
+
+        // invirtiendo el orden en el que llega la fecha de mes/dia/año a la sintaxis de mysql año-mes-día
+        $fechaFormateada = Carbon::createFromFormat('m/d/Y', $fecha)->format('Y-m-d');
+
+        //recepción de datos del formulario
+        $data = [
+            'nombre' => $request->input("nombre"),
+            'descripcion' => $request->input("descripcion"),
+            'precio' => $request->input("precio"),
+            'expiracion' => $fechaFormateada,
+            'stock' => $request->input("stock"),
+            'idProveedor' => $request->input("idProveedor"),
+        ];
+
+        //buscamos el proveedor para verificar que exista
+        $producto = ProductosModel::find($id);
+
+        $producto->update($data);
+
+        //redirecciona a la pagina productos, en teoria con un mensaje
+        return redirect()->route('productos')->with('success', 'Producto actualizado exitosamente');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * !Elimina un proveedor mediante su id
      */
     public function destroy(string $id)
     {
-        //
+        //eliminamos el proveedor de la base de datos, usando su id
+        ProductosModel::destroy($id);
+
+        //redirecciona a la pagina productos, en teoria con un mensaje
+        return redirect()->route('productos')->with('success', 'Producto eliminado exitosamente');
     }
 }
